@@ -1,0 +1,15 @@
+##
+##
+##
+
+#macro( arrows $entity )
+<a href="Utils.uriToPage($entity)">[doc]</a>
+#end
+
+#macro( prefixed $entity )
+	Utils.prefixed($data.getPrefix($entity), $entity)
+#end
+
+#macro( heading $entity )
+<h1>#prefixed( $entity )</h1>
+#end

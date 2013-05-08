@@ -1,0 +1,7 @@
+<h1>Properties</h1>
+
+<ul>
+#foreach( $property in $properties )
+    <li>$property #arrows( $property ) </li>
+#end
+</ul>

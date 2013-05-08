@@ -1,0 +1,7 @@
+<h1>Graphs</h1>
+
+<ul>
+#foreach( $graph in $graphs )
+    <li>$graph #arrows( $graph ) </li>
+#end
+</ul>

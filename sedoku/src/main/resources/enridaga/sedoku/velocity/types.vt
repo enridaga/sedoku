@@ -1,0 +1,7 @@
+<h1>Types</h1>
+
+<ul>
+#foreach( $type in $types )
+    <li>$type #arrows( $type ) </li>
+#end
+</ul>

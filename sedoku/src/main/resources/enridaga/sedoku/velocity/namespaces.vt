@@ -1,0 +1,7 @@
+<h1>Namespaces</h1>
+
+<ul>
+#foreach( $ns in $namespaces )
+    <li>$ns #arrows( $ns ) </li>
+#end
+</ul>

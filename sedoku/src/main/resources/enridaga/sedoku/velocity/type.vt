@@ -1,0 +1,2 @@
+#heading($type)
+<p><tt>$type</tt></p> 
