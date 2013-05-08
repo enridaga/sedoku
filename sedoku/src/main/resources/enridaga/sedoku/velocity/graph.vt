@@ -1,0 +1,14 @@
+<h1>$graph#if($graph.equals(""))default#end</h1>
+
+#set( $namespaces = $Utils.sorted( $data.getNamespaces($graph) ) )
+#set( $types = $Utils.sorted( $data.getTypes($graph) ) )
+#set( $properties = $Utils.sorted( $data.getProperties($graph) ) )
+
+<h2>Namespaces</h2>
+#el ( $namespaces )
+
+<h2>Types</h2>
+#el ( $types )
+
+<h2>Properties</h2>
+#el ( $properties )

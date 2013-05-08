@@ -1,0 +1,11 @@
+<h1>$namespace<h1>
+<p><tt>PREFIX $data.getPrefix($namespace): $namespace</tt></p> 
+
+#set ( $types = $Utils.sorted($data.getTypesInNamespace($namespace)) )
+#set ( $properties = $Utils.sorted($data.getPropertiesInNamespace($namespace)) )
+
+<h2>Types</h2>
+#el( $types )
+
+<h2>Properties</h2>
+#el( $properties )
