@@ -50,12 +50,18 @@ public class LiveDataProvider implements DataProvider {
 	private Set<String> properties = null;
 	private Map<String, Set<String>> graphTypesMap = null;
 	private Map<String, Set<String>> graphPropertiesMap = null;
+	private Map<String, Set<String>> namespaceTypesMap = null;
+	private Map<String, Set<String>> namespacePropertiesMap = null;
 	private Map<String, Set<String>> graphNamespacesMap = null;
-	private Map<String, Set<String>> typePropertiesMap = null;
-	private Map<String, Set<String>> typePropertiesToMap = null;
-	/**
-	 * Map<"entity", Map<"graph",Map<"property",Set<"value">>>>
-	 */
+	/** type -> graph -> property **/
+	private Map<String, Map<String, Set<String>>> typePropertiesMap = null;
+	/** type -> graph -> property **/
+	private Map<String, Map<String, Set<String>>> typePropertiesToMap = null;
+	/** property -> graph -> type **/
+	private Map<String, Map<String, Set<String>>> propertySubjectsMap = null;
+	/** property -> graph -> type **/
+	private Map<String, Map<String, Set<String>>> propertyObjectsMap = null;
+	/** entity -> graph -> property -> value **/
 	private Map<String, Map<String, Map<String, Set<String>>>> aboutMap = null;
 
 	protected HttpClient httpClient = null;
@@ -252,10 +258,10 @@ public class LiveDataProvider implements DataProvider {
 			Set<String> types = getTypes(graph);
 			Set<String> properties = getProperties(graph);
 			for (String type : types) {
-				namespaces.add(Utils.namespaceFromUri(type));
+				namespaces.add(Utils.namespace(type));
 			}
 			for (String property : properties) {
-				namespaces.add(Utils.namespaceFromUri(property));
+				namespaces.add(Utils.namespace(property));
 			}
 			graphNamespacesMap.put(graph, namespaces);
 		}
@@ -298,10 +304,12 @@ public class LiveDataProvider implements DataProvider {
 	@SuppressWarnings("unchecked")
 	public Set<String> getPropertiesOfType(String graph, String type) {
 		if (typePropertiesMap == null) {
-			typePropertiesMap = new HashMap<String, Set<String>>();
+			typePropertiesMap = new HashMap<String, Map<String, Set<String>>>();
 		}
-
 		if (!typePropertiesMap.containsKey(type)) {
+			typePropertiesMap.put(type, new HashMap<String, Set<String>>());
+		}
+		if (!typePropertiesMap.get(type).containsKey(graph)) {
 			Set<String> properties = new HashSet<String>();
 			// Get the list of properties
 			String query;
@@ -318,19 +326,23 @@ public class LiveDataProvider implements DataProvider {
 				properties.add(it.next());
 			}
 
-			typePropertiesMap.put(type, properties);
+			typePropertiesMap.get(type).put(graph, properties);
 
 		}
-		return Collections.unmodifiableSet(typePropertiesMap.get(type));
+		return Collections.unmodifiableSet(typePropertiesMap.get(type).get(
+				graph));
 	}
 
 	@SuppressWarnings("unchecked")
 	public Set<String> getPropertiesToType(String graph, String type) {
 		if (typePropertiesToMap == null) {
-			typePropertiesToMap = new HashMap<String, Set<String>>();
+			typePropertiesToMap = new HashMap<String, Map<String, Set<String>>>();
 		}
 
 		if (!typePropertiesToMap.containsKey(type)) {
+			typePropertiesToMap.put(type, new HashMap<String, Set<String>>());
+		}
+		if (!typePropertiesToMap.get(type).containsKey(graph)) {
 			Set<String> properties = new HashSet<String>();
 			// Get the list of properties
 			String query;
@@ -347,10 +359,11 @@ public class LiveDataProvider implements DataProvider {
 				properties.add(it.next());
 			}
 
-			typePropertiesToMap.put(type, properties);
+			typePropertiesToMap.get(type).put(graph, properties);
 
 		}
-		return Collections.unmodifiableSet(typePropertiesToMap.get(type));
+		return Collections.unmodifiableSet(typePropertiesToMap.get(type).get(
+				graph));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -555,5 +568,98 @@ public class LiveDataProvider implements DataProvider {
 
 	public boolean isModeQuad() {
 		return storeMode.equals(DataProvider.STORE_MODE_QUAD);
+	}
+
+	@SuppressWarnings("unchecked")
+	public Set<String> getSubjectTypes(String graph, String property) {
+
+		if (propertySubjectsMap == null) {
+			propertySubjectsMap = new HashMap<String, Map<String, Set<String>>>();
+		}
+		if (!propertySubjectsMap.containsKey(property)) {
+			propertySubjectsMap.put(property,
+					new HashMap<String, Set<String>>());
+		}
+		if (!propertySubjectsMap.get(property).containsKey(graph)) {
+			Set<String> types = new HashSet<String>();
+			for (String type : getTypes(graph)) {
+				if (getPropertiesOfType(graph, type).contains(property)) {
+					types.add(type);
+				}
+			}
+			propertySubjectsMap.get(property).put(graph, types);
+		}
+		return Collections.unmodifiableSet(propertySubjectsMap.get(property)
+				.get(graph));
+	}
+
+	@SuppressWarnings("unchecked")
+	public Set<String> getObjectTypes(String graph, String property) {
+
+		if (propertyObjectsMap == null) {
+			propertyObjectsMap = new HashMap<String, Map<String, Set<String>>>();
+		}
+		if (!propertyObjectsMap.containsKey(property)) {
+			propertyObjectsMap
+					.put(property, new HashMap<String, Set<String>>());
+		}
+		if (!propertyObjectsMap.get(property).containsKey(graph)) {
+			Set<String> types = new HashSet<String>();
+			for (String type : getTypes(graph)) {
+				if (getPropertiesToType(graph, type).contains(property)) {
+					types.add(type);
+				}
+			}
+			propertyObjectsMap.get(property).put(graph, types);
+		}
+		return Collections.unmodifiableSet(propertyObjectsMap.get(property)
+				.get(graph));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Set<String> getGraphsOfProperty(String property) {
+		Set<String> graphs = new HashSet<String>();
+
+		for (String g : getNamedGraphs()) {
+			if (getProperties(g).contains(property)) {
+				graphs.add(g);
+			}
+		}
+
+		return Collections.unmodifiableSet(graphs);
+	}
+	
+	public Set<String> getPropertiesInNamespace(String namespace) {
+		if(namespacePropertiesMap == null){
+			namespacePropertiesMap = new HashMap<String,Set<String>>();
+		}
+		if(!namespacePropertiesMap.containsKey(namespace)){
+			Set<String> npm = new HashSet<String>();
+			for (String property : getProperties()) {
+				if (!Utils.namespace(property).equals(namespace)) {
+					continue;
+				}
+				npm.add(property);
+			}
+			namespacePropertiesMap.put(namespace, npm);
+		}
+		return namespacePropertiesMap.get(namespace);
+	}
+	
+	public Set<String> getTypesInNamespace(String namespace) {
+		if(namespaceTypesMap == null){
+			namespaceTypesMap = new HashMap<String,Set<String>>();
+		}
+		if(!namespaceTypesMap.containsKey(namespace)){
+			Set<String> npm = new HashSet<String>();
+			for (String type : getTypes()) {
+				if (!Utils.namespace(type).equals(namespace)) {
+					continue;
+				}
+				npm.add(type);
+			}
+			namespaceTypesMap.put(namespace, npm);
+		}
+		return namespaceTypesMap.get(namespace);
 	}
 }

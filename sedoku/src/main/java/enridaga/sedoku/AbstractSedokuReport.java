@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
+import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
@@ -15,6 +16,7 @@ public abstract class AbstractSedokuReport extends AbstractMavenReport {
 
 	/**
 	 * Mode can be quad or triple
+	 * 
 	 * @parameter property = "storeMode" default-value="quad"
 	 * @required
 	 */
@@ -77,7 +79,8 @@ public abstract class AbstractSedokuReport extends AbstractMavenReport {
 		if (!(project.getContextValue("sedoku.data.provider") instanceof DataProvider)) {
 			getLog().info("#init data provider");
 			project.setContextValue("sedoku.data.provider",
-					new CachedDataProvider(endpoint, storeMode, dataCacheDirectory));
+					new CachedDataProvider(endpoint, storeMode,
+							dataCacheDirectory));
 		}
 		return (DataProvider) project.getContextValue("sedoku.data.provider");
 	}
@@ -114,7 +117,7 @@ public abstract class AbstractSedokuReport extends AbstractMavenReport {
 			velocityContext = new VelocityContext();
 			velocityContext.put("endpoint", endpoint);
 			velocityContext.put("data", getDataProvider());
-			velocityContext.put("Utils", Utils.class);
+			velocityContext.put("Utils", Utils.instance());
 			// velocityContext.put("endpoint", endpoint);
 			project.setContextValue("sedoku.velocity.context", velocityContext);
 		}
@@ -123,7 +126,11 @@ public abstract class AbstractSedokuReport extends AbstractMavenReport {
 	}
 
 	protected void render(String template, Object... bindings) {
-		getLog().info("#render " + template);
+		render(getSink(), template, bindings);
+	}
+
+	protected void render(Sink sink, String template, Object... bindings) {
+		getLog().info("#render " + template + "");
 		VelocityContext context = new VelocityContext(getDefaultContext());
 		for (int i = 0; i < bindings.length; i = i + 2) {
 			String key = (String) bindings[0];
@@ -134,7 +141,7 @@ public abstract class AbstractSedokuReport extends AbstractMavenReport {
 			StringWriter sw = new StringWriter();
 			getTemplateEngine().getTemplate(
 					"enridaga/sedoku/velocity/" + template).merge(context, sw);
-			getSink().rawText(sw.toString());
+			sink.rawText(sw.toString());
 		} catch (Exception e1) {
 			throw new RuntimeException(e1);
 		}

@@ -2,14 +2,51 @@
 ##
 ##
 
-#macro( arrows $entity )
-<a href="Utils.uriToPage($entity)">[doc]</a>
+#macro( link $entity )
+<a href="$Utils.uriToPage($entity)">[doc]</a>
 #end
 
 #macro( prefixed $entity )
-	Utils.prefixed($data.getPrefix($entity), $entity)
+	$Utils.prefixed($data.getPrefix( $Utils.namespace($entity) ), $entity)
 #end
 
 #macro( heading $entity )
 <h1>#prefixed( $entity )</h1>
+#end
+
+#macro( about $entity )
+	#set ( $about = $data.about($entity) )
+	#foreach($entry in $about.entrySet())
+	<table>
+	<caption>$entry.getKey()</caption>
+	<tbody>
+		#foreach($property in $entry.getValue().entrySet()) 
+		<tr>
+			<th>$property.getKey() #link($property.getKey())</th>
+			<td>
+			#foreach($value in $property.getValue())
+				$value
+			#end
+			</td>
+		</tr>			
+		#end
+	#end
+	</tbody>
+	</table>
+#end
+
+#macro( ul $list )
+	<ul>
+	#foreach($li in $list)
+		<li>$li</li>
+	#end
+	</ul>
+#end
+
+#macro( el $entities)
+	<ul>
+	#foreach($li in $entities)
+		<li>#link($li) $li </li>
+	#end
+	</ul>
 #end

@@ -2,6 +2,6 @@
 
 <ul>
 #foreach( $graph in $graphs )
-    <li>$graph #arrows( $graph ) </li>
+    <li>#if($graph.equals("")) default #end $graph #link( $graph ) </li>
 #end
 </ul>

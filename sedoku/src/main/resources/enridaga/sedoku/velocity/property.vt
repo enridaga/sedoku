@@ -1,0 +1,17 @@
+#heading($property)
+<p><tt>$property</tt></p> 
+
+#about ($property)
+
+<p>Uses in $endpoint:</p>
+#foreach($graph in $data.getGraphsOfProperty($property))
+	<h2><tt>GRAPH $graph #if( $graph.equals("") ) default #end</tt></h2>
+	#set( $t2p =  $Utils.sorted($data.getSubjectTypes($graph, $property)) )
+	<p>A subject in this graph may be of the following types:</p>
+	#el( $t2p )
+	<p>An object in this graph may be of the following types:</p>
+	#set( $p2t =  $Utils.sorted($data.getObjectTypes($graph, $property)) )
+	#el( $p2t )
+	
+	<p>TODO add datatypes</p>
+#end

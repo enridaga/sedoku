@@ -1,7 +1,7 @@
 <h1>Types</h1>
 
 <ul>
-#foreach( $type in $types )
-    <li>$type #arrows( $type ) </li>
+#foreach( $type in $Utils.sorted($types) )
+    <li>$type #link( $type ) </li>
 #end
 </ul>

@@ -26,6 +26,10 @@ public interface DataProvider {
 
 	public Set<String> getTypes();
 
+	public Set<String> getTypesInNamespace(String namespace);
+
+	public Set<String> getPropertiesInNamespace(String namespace);
+
 	public Set<String> getProperties();
 
 	public Set<String> getNamespaces();
@@ -33,6 +37,8 @@ public interface DataProvider {
 	public Set<String> getPropertiesOfType(String graph, String type);
 
 	public Set<String> getGraphsOfType(String type);
+
+	public Set<String> getGraphsOfProperty(String property);
 
 	public Set<String> getPropertiesToType(String graph,
 			String type);
@@ -44,5 +50,10 @@ public interface DataProvider {
 	public String getStoreMode();
 
 	public boolean isModeTriple();
+	
 	public boolean isModeQuad();
+
+	public Set<String> getSubjectTypes(String graph, String property);
+
+	public Set<String> getObjectTypes(String graph, String property);
 }

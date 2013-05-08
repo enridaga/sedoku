@@ -1,7 +1,15 @@
 <h1>Namespaces</h1>
 
-<ul>
+<table>
+<tr>
+<td>
 #foreach( $ns in $namespaces )
-    <li>$ns #arrows( $ns ) </li>
+    <tt>PREFIX $data.getPrefix($ns): &lt;$ns&gt; . </tt> <br/>
 #end
-</ul>
+</td>
+<td>
+#foreach( $ns in $namespaces )
+    #link( $ns ) <br/>
+#end
+</td>
+</table>
