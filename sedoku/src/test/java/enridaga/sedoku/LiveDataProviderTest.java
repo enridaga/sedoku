@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ public class LiveDataProviderTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void getPrefix() {
 		log.info("#getPrefix()");

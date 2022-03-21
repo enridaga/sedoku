@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
 
 /**
  * 
@@ -58,11 +58,11 @@ public class Utils {
 
 	public static final List<?> sorted(Collection<?> collection) {
 		if(collection instanceof List){
-			Collections.sort((List<?>)collection);
+			Collections.sort((List)collection);
 			return (List<?>) collection;
 		}else{
 			@SuppressWarnings({ "unchecked", "rawtypes" })
-			List<?> list = new ArrayList(collection);
+			List list = new ArrayList(collection);
 			Collections.sort(list);
 			return list;
 		}

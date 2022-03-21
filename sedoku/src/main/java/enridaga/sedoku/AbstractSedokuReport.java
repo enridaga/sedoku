@@ -98,8 +98,6 @@ public abstract class AbstractSedokuReport extends AbstractMavenReport {
 				pr.load(getClass().getResourceAsStream("velocity.properties"));
 				ve = new VelocityEngine(pr);
 				ve.init();
-			} catch (URISyntaxException e) {
-				throw new RuntimeException(e);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
